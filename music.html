@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>Winter Night</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#02030a;
+  overflow:hidden;
+  font-family:'Amiri',serif;
+  color:#fff;
+}
+
+canvas{position:fixed;inset:0;z-index:0}
+
+/* شعر */
+.poem{
+  position:relative;
+  z-index:2;
+  max-width:900px;
+  margin:60px auto 0;
+  text-align:center;
+  font-size:24px;
+  line-height:2.2;
+  text-shadow:0 0 16px rgba(255,255,255,.25);
+}
+
+/* عکس */
+.photo{
+  display:block;
+  margin:40px auto 0;
+  width:70%;
+  max-width:520px;
+  border-radius:18px;
+  box-shadow:0 0 40px rgba(255,255,255,.15);
+  position:relative;
+  z-index:2;
+}
+
+/* آدم برفی */
+.snowman{
+  position:absolute;
+  bottom:40px;
+  left:40px;
+  width:150px;
+  z-index:3;
+}
+
+/* برف زمین PNG */
+.ground-snow{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* ===== MUSIC PLAYER (CENTER) ===== */
+.player{
+  position:relative;
+  z-index:3;
+  margin:50px auto 0;
+  width:420px;
+  padding:26px;
+  border-radius:22px;
+  background:rgba(255,255,255,0.14);
+  backdrop-filter:blur(16px);
+  box-shadow:0 0 40px rgba(255,255,255,.18);
+  text-align:center;
+}
+
+/* wave bar */
+.wave{
+  display:flex;
+  align-items:flex-end;
+  gap:5px;
+  height:48px;
+  margin-bottom:22px;
+}
+
+.wave span{
+  flex:1;
+  background:white;
+  height:30%;
+  border-radius:6px;
+  animation:wave 1.1s infinite ease-in-out;
+  opacity:.9;
+}
+
+.wave span:nth-child(odd){animation-delay:.2s}
+.wave span:nth-child(even){animation-delay:.4s}
+
+@keyframes wave{
+  0%,100%{height:30%}
+  50%{height:100%}
+}
+
+/* controls */
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:26px;
+}
+
+.controls button{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.95);
+  color:#000;
+  font-size:20px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="snow"></canvas>
+
+<div class="poem">
+ای که بی‌تو شب فراق بر ما تاریک شد،<br>
+دل ز آتش غم سوخت و جان‌زده و پریشان شد.<br><br>
+هر لحظه فراق تو، خود چون دریای بی‌کرانه است،<br>
+ای کاش با چنین غم، دلِ ما کنارِ تو آشنا بود.<br><br>
+بی‌تو روز و شب دل و جانم نیاساید دمی،<br>
+بازگرد ای مایهٔ تسکین که تا رفتی تو رفت…
+</div>
+
+<img src="photo.jpg" class="photo">
+
+<!-- MUSIC PLAYER CENTER -->
+<div class="player">
+  <div class="wave">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="controls">
+    <button id="prev">⏮</button>
+    <button id="play">▶</button>
+    <button id="next">⏭</button>
+  </div>
+
+  <audio id="audio"></audio>
+</div>
+
+<img src="snowman.png" class="snowman">
+<img src="ground-snow.png" class="ground-snow">
+
+<script>
+/* snow */
+const c=document.getElementById("snow"),ctx=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+let flakes=[...Array(220)].map(()=>({
+  x:Math.random()*c.width,
+  y:Math.random()*c.height,
+  r:Math.random()*2+1,
+  s:Math.random()*1+.5
+}));
+(function snow(){
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle="white";
+  flakes.forEach(f=>{
+    ctx.beginPath();
+    ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+    ctx.fill();
+    f.y+=f.s;
+    if(f.y>c.height)f.y=0;
+  });
+  requestAnimationFrame(snow);
+})();
+
+/* music */
+const tracks=["music1.mp3","music2.mp3","music3.mp3"];
+let index=0;
+const audio=document.getElementById("audio");
+const playBtn=document.getElementById("play");
+
+audio.src=tracks[index];
+
+playBtn.onclick=()=>{
+  if(audio.paused){audio.play();playBtn.textContent="⏸";}
+  else{audio.pause();playBtn.textContent="▶";}
+};
+
+document.getElementById("next").onclick=()=>{
+  index=(index+1)%tracks.length;
+  audio.src=tracks[index];
+  audio.play();
+  playBtn.textContent="⏸";
+};
+
+document.getElementById("prev").onclick=()=>{
+  index=(index-1+tracks.length)%tracks.length;
+  audio.src=tracks[index];
+  audio.play();
+  playBtn.textContent="⏸";
+};
+</script>
+
+</body>
+</html>
